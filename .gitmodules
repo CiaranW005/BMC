@@ -1,0 +1,6 @@
+[submodule "esp32"]
+	path = esp32
+	url = https://github.com/CiaranW005/ESP32-BMC.git
+[submodule "oracle-server"]
+	path = oracle-server
+	url = https://github.com/CiaranW005/bmc-oracle.git
