@@ -1,0 +1,22 @@
+{
+  "folders": [
+    {
+      "name": "BMC",
+      "path": "."
+    },
+    {
+      "name": "ESP32",
+      "path": "esp32"
+    },
+    {
+      "name": "Oracle Server",
+      "path": "oracle-server"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "esp32": true,
+      "oracle-server": true
+    }
+  }
+}
