@@ -1,0 +1,33 @@
+name: Deploy Oracle Server
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "oracle-server"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get pinned Oracle commit
+        id: oracle
+        run: |
+          echo "commit=$(git rev-parse HEAD:oracle-server)" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy to Oracle VM
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.ORACLE_HOST }}
+          username: ${{ secrets.ORACLE_USER }}
+          key: ${{ secrets.ORACLE_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/oracle-server
+            git fetch origin
+            git checkout ${{ steps.oracle.outputs.commit }}
+            go build -o bmc-oracle .
+            sudo systemctl restart bmc-oracle
