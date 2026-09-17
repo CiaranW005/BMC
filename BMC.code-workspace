@@ -11,12 +11,17 @@
     {
       "name": "Oracle Server",
       "path": "oracle-server"
+    },
+    {
+      "name": "Frontend",
+      "path": "frontend"
     }
   ],
   "settings": {
     "files.exclude": {
       "esp32": true,
-      "oracle-server": true
+      "oracle-server": true,
+      "frontend": true
     }
   }
 }
