@@ -6,4 +6,4 @@
 	url = https://github.com/CiaranW005/bmc-oracle.git
 [submodule "frontend"]
 	path = frontend
-	url = git@github.com:CiaranW005/bmc-frontend.git
+	url = https://github.com/CiaranW005/bmc-frontend.git

@@ -5,7 +5,9 @@ on:
     branches:
       - master
     paths:
-      - "oracle-server"
+      - "oracle-server/**"
+      - "frontend/**"
+      - "deployment/**"
 
 jobs:
   deploy:
@@ -13,21 +15,68 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Get pinned Oracle commit
-        id: oracle
+        with:
+          token: ${{ secrets.SUBMODULE_TOKEN }}
+      
+      - name: Configure Git for private submodules
         run: |
-          echo "commit=$(git rev-parse HEAD:oracle-server)" >> "$GITHUB_OUTPUT"
+          git config --global url."https://x-access-token:${{ secrets.SUBMODULE_TOKEN }}@github.com/".insteadOf "https://github.com/"
 
-      - name: Deploy to Oracle VM
+      - name: Checkout required submodules
+        run: |
+          git submodule update --init oracle-server
+          git submodule update --init frontend
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+        
+      - name: Build Oracle server
+        run: |
+          cd oracle-server
+          GOOS=linux GOARCH=amd64 go build -o bmc-oracle ./cmd/bmc-oracle
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Inspect build artifacts
+        run: |
+          echo "---- Backend ----"
+          ls -lah oracle-server/
+          
+          echo "---- Frontend ----"
+          find frontend -maxdepth 3 -type f | sort | head -100
+          
+          echo "---- Deployment ----"
+          find deployment -maxdepth 2 -type f | sort
+          
+      - name: Copy deployment files to Oracle VM
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.ORACLE_HOST }}
+          username: ${{ secrets.ORACLE_USER }}
+          key: ${{ secrets.ORACLE_SSH_KEY }}
+          source: |
+            oracle-server/bmc-oracle,frontend/dist/*,deployment/*
+          target: /home/ubuntu/deploy
+
+      - name: Deploy on Oracle VM
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.ORACLE_HOST }}
           username: ${{ secrets.ORACLE_USER }}
           key: ${{ secrets.ORACLE_SSH_KEY }}
           script: |
-            cd /home/ubuntu/oracle-server
-            git fetch origin
-            git checkout ${{ steps.oracle.outputs.commit }}
-            go build -o bmc-oracle .
-            sudo systemctl restart bmc-oracle
+            chmod +x /home/ubuntu/deploy/deployment/scripts/deploy.sh
+            /home/ubuntu/deploy/deployment/scripts/deploy.sh
