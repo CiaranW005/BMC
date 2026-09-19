@@ -5,9 +5,11 @@ on:
     branches:
       - master
     paths:
-      - "oracle-server/**"
-      - "frontend/**"
-      - "deployment/**"
+    - "oracle-server"
+    - "oracle-server/**"
+    - "frontend"
+    - "frontend/**"
+    - "deployment/**"
 
 jobs:
   deploy:
