@@ -1,7 +1,6 @@
 go 1.26.0
 
 use (
-	./oracle-server
-	./pc-agent
 	./go-protocol
+	./pc-agent
 )

@@ -1,0 +1,69 @@
+name: Publish PC Agent
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "pc-agent"
+      - ".github/workflows/deploy-pc-agent.yml"
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-pc-agent
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout BMC
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.SUBMODULE_TOKEN }}
+          submodules: false
+
+      - name: Configure Git for private submodules
+        env:
+          SUBMODULE_TOKEN: ${{ secrets.SUBMODULE_TOKEN }}
+        run: |
+          git config --global \
+            url."https://x-access-token:${SUBMODULE_TOKEN}@github.com/".insteadOf \
+            "https://github.com/"
+
+      - name: Checkout required submodules
+        run: |
+          git submodule update --init pc-agent go-protocol
+          
+      - name: Build PC Agent
+        working-directory: pc-agent
+        env:
+          GOOS: linux
+          GOARCH: amd64
+          CGO_ENABLED: "0"
+        run: |
+          go build -trimpath -ldflags="-s -w" \
+            -o ../bmc-agent \
+            ./cmd/start-agent
+
+      - name: Generate checksum
+        run: sha256sum bmc-agent > bmc-agent.sha256
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.sha }}
+        run: |
+          TAG="pc-agent-${SHA}"
+
+          gh release create "$TAG" \
+            bmc-agent \
+            bmc-agent.sha256 \
+            --title "PC Agent ${SHA:0:7}" \
+            --notes "PC Agent built from BMC commit $SHA" \
+            --latest
