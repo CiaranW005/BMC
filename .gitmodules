@@ -7,3 +7,9 @@
 [submodule "frontend"]
 	path = frontend
 	url = https://github.com/CiaranW005/bmc-frontend.git
+[submodule "go-protocol"]
+	path = go-protocol
+	url = https://github.com/CiaranW005/go-protocol.git
+[submodule "pc-agent"]
+	path = pc-agent
+	url = https://github.com/CiaranW005/pc-agent.git

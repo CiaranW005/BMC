@@ -37,7 +37,7 @@ jobs:
       - name: Build Oracle server
         run: |
           cd oracle-server
-          GOOS=linux GOARCH=amd64 go build -o bmc-oracle ./cmd/bmc-oracle
+          GOWORK=off GOOS=linux GOARCH=amd64 go build -o bmc-oracle ./cmd/bmc-oracle
 
       - name: Set up Node
         uses: actions/setup-node@v4

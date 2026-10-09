@@ -13,15 +13,24 @@
       "path": "oracle-server"
     },
     {
+      "name": "PC Agent",
+      "path": "pc-agent"
+    },
+    {
+      "name": "Go Protocol",
+      "path": "go-protocol"
+    },
+    {
       "name": "Frontend",
       "path": "frontend"
-    }
+    },
   ],
   "settings": {
     "files.exclude": {
       "esp32": true,
       "oracle-server": true,
-      "frontend": true
+      "frontend": true,
+      "pc-agent": true
     }
   }
 }
