@@ -30,7 +30,8 @@
       "esp32": true,
       "oracle-server": true,
       "frontend": true,
-      "pc-agent": true
+      "pc-agent": true,
+      "go-protocol": true
     }
   }
 }

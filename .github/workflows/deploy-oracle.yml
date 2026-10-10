@@ -48,6 +48,8 @@ jobs:
 
       - name: Build frontend
         working-directory: frontend
+        env:
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
         run: |
           npm ci
           npm run build
@@ -75,10 +77,14 @@ jobs:
 
       - name: Deploy on Oracle VM
         uses: appleboy/ssh-action@v1
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_ALLOWED_SUBS: ${{ secrets.GOOGLE_ALLOWED_SUBS }}
         with:
           host: ${{ secrets.ORACLE_HOST }}
           username: ${{ secrets.ORACLE_USER }}
           key: ${{ secrets.ORACLE_SSH_KEY }}
+          envs: GOOGLE_CLIENT_ID, GOOGLE_ALLOWED_SUBS
           script: |
             chmod +x /home/ubuntu/deploy/deployment/scripts/deploy.sh
             /home/ubuntu/deploy/deployment/scripts/deploy.sh
