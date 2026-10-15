@@ -32,6 +32,29 @@
       "frontend": true,
       "pc-agent": true,
       "go-protocol": true
-    }
+    },
+        "platformio-ide.toolbar": [
+        {
+            "text": "$(check)",
+            "tooltip": "Build",
+            "commands": "platformio-ide.build"
+        },
+        {
+            "text": "$(arrow-up)",
+            "tooltip": "Upload",
+            "commands": "platformio-ide.upload"
+        },
+        {
+            "text": "$(terminal)",
+            "tooltip": "Tio Serial Monitor",
+            "commands": [
+                {
+                    "id": "workbench.action.tasks.runTask",
+                    "args": "Tio Serial Monitor"
+                }
+            ]
+        }
+    ]
+
   }
 }

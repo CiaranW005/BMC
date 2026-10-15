@@ -39,7 +39,27 @@ jobs:
       - name: Checkout required submodules
         run: |
           git submodule update --init pc-agent go-protocol
-          
+          git -C go-protocol fetch origin main
+          git -C go-protocol checkout --detach origin/main
+          git -C go-protocol rev-parse HEAD
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.26.0"
+          cache: false
+
+      - name: Configure build workspace
+        run: |
+          cat > go.work <<'EOF'
+          go 1.26.0
+
+          use (
+              ./pc-agent
+              ./go-protocol
+          )
+          EOF
+
       - name: Build PC Agent
         working-directory: pc-agent
         env:
