@@ -26,6 +26,7 @@
     },
   ],
   "settings": {
+    // Hide component folders under BMC because each has its own workspace root.
     "files.exclude": {
       "esp32": true,
       "oracle-server": true,

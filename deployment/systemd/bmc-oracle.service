@@ -5,6 +5,9 @@ After=network.target
 [Service]
 User=ubuntu
 ExecStart=/usr/local/bin/bmc-oracle
+
+# Required runtime configuration; this file must exist before the service starts.
+# deploy.sh updates Google authentication values while preserving other entries.
 EnvironmentFile=/home/ubuntu/.config/bmc-oracle/.env
 
 Restart=always

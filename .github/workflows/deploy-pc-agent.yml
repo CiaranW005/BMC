@@ -35,20 +35,19 @@ jobs:
           git config --global \
             url."https://x-access-token:${SUBMODULE_TOKEN}@github.com/".insteadOf \
             "https://github.com/"
-
+      
+      # Builds from the latest submodule commits
       - name: Checkout required submodules
         run: |
           git submodule update --init pc-agent go-protocol
-          git -C go-protocol fetch origin main
-          git -C go-protocol checkout --detach origin/main
-          git -C go-protocol rev-parse HEAD
 
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: "1.26.0"
           cache: false
-
+      
+      # Limit the CI workspace to the modules checked out for this build.
       - name: Configure build workspace
         run: |
           cat > go.work <<'EOF'
@@ -59,7 +58,8 @@ jobs:
               ./go-protocol
           )
           EOF
-
+        
+      # Produce a Linux amd64 binary without a runtime dependency on C libraries.
       - name: Build PC Agent
         working-directory: pc-agent
         env:
@@ -73,7 +73,8 @@ jobs:
 
       - name: Generate checksum
         run: sha256sum bmc-agent > bmc-agent.sha256
-
+        
+      # Identify this release by the parent BMC commit that triggered the build.
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -81,6 +82,7 @@ jobs:
         run: |
           TAG="pc-agent-${SHA}"
 
+          # Publish the binary and checksum, and mark this release as the repository's latest.
           gh release create "$TAG" \
             bmc-agent \
             bmc-agent.sha256 \

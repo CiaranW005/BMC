@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+    # Exact paths match submodule pointer updates; /** patterns match files beneath them.
     paths:
     - "oracle-server"
     - "oracle-server/**"
@@ -23,20 +24,19 @@ jobs:
       - name: Configure Git for private submodules
         run: |
           git config --global url."https://x-access-token:${{ secrets.SUBMODULE_TOKEN }}@github.com/".insteadOf "https://github.com/"
-
+        
+      # Check out the submodule commits recorded by this BMC commit.
       - name: Checkout required submodules
         run: |
           git submodule update --init oracle-server frontend go-protocol
-          git -C go-protocol fetch origin main
-          git -C go-protocol checkout --detach origin/main
-          git -C go-protocol rev-parse HEAD
 
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version: "1.26.0"
           cache: false
-
+      
+        # Limit the CI workspace to the modules checked out for this build.
       - name: Configure build workspace
         run: |
           cat > go.work <<'EOF'

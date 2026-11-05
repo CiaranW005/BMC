@@ -1,6 +1,8 @@
 go 1.26.0
 
+// Resolve these modules locally so changes across repos can be developed together.
 use (
 	./go-protocol
 	./pc-agent
+	./oracle-server
 )

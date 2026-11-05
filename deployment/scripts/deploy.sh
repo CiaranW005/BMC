@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+# Run on the Oracle VM after CI uploads artifacts to /home/ubuntu/deploy.
+# Requires sudo access, systemd, and an existing Caddy installation.
 DEPLOY_DIR="/home/ubuntu/deploy"
 ENV_FILE="/home/ubuntu/.config/bmc-oracle/.env"
 
@@ -12,7 +14,7 @@ sudo install \
     "$DEPLOY_DIR/oracle-server/bmc-oracle" \
     /usr/local/bin/bmc-oracle
 
-
+# Replace the previous frontend build to avoid leaving outdated assets behind.
 echo "Installing frontend..."
 
 sudo mkdir -p /var/www/bmc
@@ -53,7 +55,8 @@ set_env() {
     local key="$1"
     local value="$2"
 
-    # These variables should contain only the expected characters.
+    # Only accept values that can be written directly as unquoted KEY=value entries.
+    # Spaces, newlines, and shell quoting characters are intentionally rejected.
     if [[ ! "$value" =~ ^[A-Za-z0-9._,@-]+$ ]]; then
         echo "Invalid value for $key" >&2
         exit 1
